@@ -1,120 +1,191 @@
-# Arduino Library Manager list
+# DoublyLinkedList
 
-This repository contains the list of libraries in the
-[Arduino Library Manager](https://docs.arduino.cc/software/ide-v1/tutorials/installing-libraries#using-the-library-manager) index.
+## Description
 
-## Table of Contents
+The `DoublyLinkedList` class implements a doubly linked list. Each element in the list is represented by an object of type `Node`. The list can be either circular or non-circular, depending on the configuration. The class provides a set of operations for insertion, removal, and manipulation of elements in the list. Additionally, the class features a cursor, allowing for easy navigation through the list.
 
-<!-- toc -->
+It is possible to use negative indices for backward traversal. For example, `list[-1]` retrieves the last element of the list.
 
-- [Frequently asked questions](#frequently-asked-questions)
-- [Adding a library to Library Manager](#adding-a-library-to-library-manager)
-  - [Instructions](#instructions)
-    - [If the problem is with the pull request:](#if-the-problem-is-with-the-pull-request)
-    - [If the problem is with the library:](#if-the-problem-is-with-the-library)
-- [Changing the URL of a library already in Library Manager](#changing-the-url-of-a-library-already-in-library-manager)
-- [Removing a library from Library Manager](#removing-a-library-from-library-manager)
-- [Report a problem with Library Manager](#report-a-problem-with-library-manager)
+### Example
 
-<!-- tocstop -->
+```cpp
+#include <DoublyLinkedList.h>
 
-## Frequently asked questions
+// Function to print an element
+void printElement(int e)
+{
+  Serial.print(e);
+  Serial.print(" ");
+}
 
-For more information about Arduino Library Manager and how the index is maintained, please see [the FAQ](FAQ.md).
+// Function to calculate the cube of an element
+int cube(int e)
+{
+  return e * e * e;
+}
 
-## Adding a library to Library Manager
+// Function to filter odd elements
+bool oddFilter(int e)
+{
+  return e % 2;
+}
 
-If you would like to make a library available for installation via Library Manager, just submit a
-[pull request](https://docs.github.com/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests)
-that adds the repository URL to [the list](repositories.txt). You are welcome to add multiple libraries at once.
+void setup()
+{
+  Serial.begin(115200);
 
-See the instructions below for detailed instructions on how to do this via the GitHub web interface.
+  // Create a circular doubly linked list
+  DoublyLinkedList<int> list(true);
 
-### Instructions
+  // Insert elements into the list
+  list.insert(1);
+  list.insert(2);
+  list.insert(3);
+  list.insert(4);
+  list.insert(5);
+  list.insert(6);
+  list.insert(7);
+  list.insert(8);
 
-1. You may want to first take a look at
-   [the requirements for admission into the Arduino Library Manager index](FAQ.md#submission-requirements). Each submission will be checked for
-   compliance before being accepted.
-1. Click the following link:<br />
-   https://github.com/arduino/library-registry/fork<br />
-   The "**Create a new fork**" page will open.
-1. Click the <kbd>Create fork</kbd> button in the "**Create a new fork**" page.<br />
-   A "**Forking arduino/library-registry**" page will open while the fork is in the process of being created.
-1. Wait for the "Forking" process to finish.<br />
-   The home page of your [fork](https://docs.github.com/get-started/quickstart/fork-a-repo) of the **library-registry** repository will open.
-1. Click on the file `repositories.txt` under the list of files you see in that page.<br />
-   The "**library-registry/repositories.txt**" page will open.
-1. Click the pencil icon ("Edit this file") at the right side of the toolbar in the "**library-registry/repositories.txt**" page.<br />
-   The `repositories.txt` file will open in the online text editor.
-1. Add the library repository's URL to the list (it doesn't matter where in the list). This should be the URL of the repository home page. For example:
-   `https://github.com/arduino-libraries/Servo`
-1. Click the <kbd>Commit changes...</kbd> button located near the top right corner of the page.<br />
-   The "**Commit changes**" dialog will open.
-1. Click the <kbd>Commit changes</kbd> button in the "**Commit changes**" dialog.<br />
-   The "**library-registry/repositories.txt**" page will open.
-1. Click the "**library-registry**" link at the top of the "**library-registry/repositories.txt**" page.<br />
-   The home page of your fork of the **library-registry** repository will open.
-1. You should see a banner on the page that says:
+  // Remove the last element in the list (negative index)
+  list.removeAt(-1);
 
-   > **This branch is 1 commit ahead of arduino:main.**
+  // Remove element with value 2 from the list
+  list.remove(2);
 
-   Click the "**Contribute**" link near the right side of that banner.<br />
-   A menu will open.
+  // Create a new list by applying the cube function to each element
+  DoublyLinkedList<int> mappedList = list.map(cube);
 
-1. Click the <kbd>Open pull request</kbd> button in the menu.<br />
-   The "**Open a pull request**" page will open.
-1. In the **"Open a pull request"** window that opens, click the <kbd>Create pull request</kbd> button.
+  Serial.println("Mapped list");
+  // Print each element in the mapped list
+  mappedList.foreach(printElement);
+  Serial.println();
 
-The library will be automatically checked for compliance as soon as the pull request is submitted. If no problems were
-found, the pull request will be immediately merged and the library will be available for installation via Library
-Manager within a day's time.
+  // Create a new list by filtering out odd elements from the mapped list
+  DoublyLinkedList<int> filteredList = mappedList.filter(oddFilter);
 
-If any problems are found, a bot will comment on the pull request to tell you what is wrong. The problem may be either
-with your pull request or with the library.
+  Serial.println("Filtered list");
+  // Print each element in the filtered list
+  filteredList.foreach(printElement);
+  Serial.println();
 
-#### If the problem is with the pull request:
+  Serial.println("Original list");
+  // Print each element in the original list
+  list.foreach(printElement);
+  Serial.println();
 
-Edit the file in the
-[branch](https://docs.github.com/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches)
-you submitted the pull request from in your fork of the `arduino/library-registry` repository, then commit.
+  // Create a new list by concatenating the original, mapped, and filtered lists
+  DoublyLinkedList<int> allList;
+  allList += list;
+  allList += mappedList;
+  allList += filteredList;
 
-Doing this will update the pull request and cause the automated checks to run again.
+  // Clear individual lists
+  list.clear();
+  mappedList.clear();
+  filteredList.clear();
 
-#### If the problem is with the library:
+  Serial.println("All list concatenated");
+  // Print each element in the concatenated list
+  allList.foreach(printElement);
+  Serial.println();
 
-1. Make the necessary fix in the library repository.
-1. Increment the `version` value in the library's
-   [library.properties file](https://arduino.github.io/arduino-cli/latest/library-specification/#library-metadata).
-1. Create a
-   [release](https://docs.github.com/repositories/releasing-projects-on-github/managing-releases-in-a-repository)
-   or [tag](https://git-scm.com/docs/git-tag). The Library Manager index always uses tagged versions of the libraries,
-   so even if the development version of the library is compliant, it can't be accepted until the latest release or tag
-   is compliant. Alternatively, you can redo the existing release/tag if you prefer.
-1. Comment on your pull request here in the `arduino/library-registry` repository, mentioning **@ArduinoBot** in the
-   comment. Doing this will cause the automated check to run again.
+  // Clear the concatenated list
+  allList.clear();
+}
 
-## Changing the URL of a library already in Library Manager
+void loop()
+{
+}
 
-Submit a pull request that changes the URL as desired in [repositories.txt](repositories.txt). This can be done by
-following [the instructions above](#instructions).
+```
 
-Since this type of request must be reviewed by a human maintainer, please write an explanation in the pull request
-description, making it clear that the URL is intentionally being changed.
+## Constructor
 
-## Removing a library from Library Manager
+### `DoublyLinkedList(bool circular = false) : circular(circular)`
 
-Submit a pull request that removes the URL from [repositories.txt](repositories.txt). This can be done by following
-[the instructions above](#instructions).
+The constructor takes a boolean parameter, which is false by default, and determines whether the list is circular or not.
 
-Since this type of request must be reviewed by a human maintainer, please write an explanation in the pull request
-description, making it clear that the URL is intentionally being removed.
+## List Manipulation Operations
 
-## Report a problem with Library Manager
+### `setIsCircular(bool value)`
 
-First, please take a look at [the FAQ](FAQ.md). If a library release is missing from Library Manager, it is usually
-because it was not compliant with all [the requirements](FAQ.md#update-requirements) listed in that document.
+Sets the circular flag for the list. If `value` is true, it makes the list circular; otherwise, it makes the list non-circular.
 
-This repository is not an appropriate place to request support or report problems with a library. Check the library's
-own documentation for instructions or ask on the [Arduino Forum](https://forum.arduino.cc/).
+### `insert(const T value, int64_t index)`
 
-If the problem is about something else, please submit an issue report [here](https://github.com/arduino/library-registry/issues/new/choose).
+Inserts a new element with the specified value at the given index in the list.
+
+### `insert(const T value)`
+
+Inserts a new element with the specified value at the end of the list.
+
+### `size() const`
+
+Returns the number of elements in the list.
+
+### `removeAt(int64_t index)`
+
+Removes the element at the specified index from the list.
+
+### `remove(T value)`
+
+Removes the first occurrence of the specified value from the list.
+
+### `indexOf(T value) const`
+
+Returns the index of the first occurrence of the specified value in the list.
+
+### `set(int64_t index, T value)`
+
+Modifies the value of the element at the specified index.
+
+### `pop()`
+
+Removes and returns the last element of the list.
+
+### `getCursorValue() const`
+
+Returns the value of the current element.
+
+### `getCursorPosition() const`
+
+Returns the position of the current element in the list.
+
+### `shiftCursor(const int64_t offset)`
+
+Shifts the cursor forward or backward by a specified number of positions.
+
+### `setCursorAt(const int64_t pos)`
+
+Sets the cursor to the specified position in the list.
+
+### `clear()`
+
+Completely empties the list.
+
+## Transformation and Iteration Operations
+
+### `filter(bool (*func)(T))`
+
+It takes a function as a parameter, which returns a boolean and accepts a parameter of type T.
+
+Executes a specified function on each element of the list.
+
+### `map(T (*func)(T)) const`
+
+It takes a function as a parameter, which returns a T type and accepts a parameter of type T.
+
+Creates and returns a new list obtained by applying a specified function to each element of the list.
+
+## Operators
+
+### `+=`
+
+Appends all elements from another list to the end of this list.
+
+## Access Operators
+
+### `operator[](const int64_t index) const`
+
+Returns the value of the element at the specified index in the list.
