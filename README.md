@@ -6,6 +6,8 @@ The `DoublyLinkedList` class implements a doubly linked list. Each element in th
 
 It is possible to use negative indices for backward traversal. For example, `list[-1]` retrieves the last element of the list.
 
+Moreover, the DoublyLinkedList class offers functions for easily obtaining a new list using methods such as map or filter, leveraging functional programming techniques.
+
 ### Example
 
 ```cpp
